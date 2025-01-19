@@ -1,0 +1,16 @@
+c(bibentry(bibtype = "Article",
+           key = "methylation pipeline evaluation",
+           author = c(
+           person("Zongli", "Xu"),
+           person("Alison A", "Motsinger-Reif"),
+           person("Liang", "Niu")
+                ),
+           title = "dmGsea: Flexible Gene Set Enrichment Analysis for DNA Methylaiton Data",
+           journal = "In review",
+           year = "2024",
+           pubmed = "---",
+           header = "methylation pipeline evaluation")
+
+)
+
+

@@ -1,0 +1,25 @@
+Package: dmGsea
+Type: Package
+Title: Geneset Enrichment Analysis for Complex Omics Data
+Version: 0.99.0
+Authors@R:
+  c(person("Zongli","Xu",email="xuz@niehs.nih.gov",role=c("cre","aut"),comment=c(ORCID="0000-0002-9034-8902")),
+   person("Alison","Motsinger-Reif",email="alison.motsinger-reif@nih.gov",role="aut"),
+    person("Liang", "Niu", role="aut",email="niulg@ucmail.uc.edu"))
+Description: The R package dmGsea offers versatile gene set enrichment analysis tools for complex omics datasets, including DNA methylation, proteomics and gene expression. It addresses challenges like correlated probes, probe number bias, and multi-mapping probes with threshold- and ranking-based methods. The package also features a fast, accurate ranking-based method optimized for gene expression and RNA-seq data.
+License: Artistic-2.0
+biocViews: GeneSetEnrichment, Pathways,DNAMethylation,Proteomics,
+	CopyNumberVariation, GeneExpression, GenomicVariation 
+Depends: utils,stats,parallel,Matrix
+Suggests: msigdbr, org.Hs.eg.db, org.Mm.eg.db, minfi, knitr, rmarkdown, GO.db
+Imports:  dqrng,AnnotationDbi,poolr,BiasedUrn
+VignetteBuilder: knitr
+Encoding: UTF-8
+URL: https://github.com/Bioconductor/dmGsea
+BugReports: https://github.com/Bioconductor/dmGsea/issues
+git_url: https://git.bioconductor.org/packages/dmGsea
+Maintainer: Zongli Xu <xuz@niehs.nih.gov>
+NeedsCompilation: no
+
+
+
