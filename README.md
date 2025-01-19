@@ -1,5 +1,5 @@
 # dmGsea
-## Geneset Enrichment Analysis for Complex Omics Data
+## Flexible Gene Set Enrichment Analysis for DNA Methylation Data
 ## Introduction
 The R package <b>dmGsea</b> provides gene set enrichment analysis functions for complex Omics data. In many omics datasets, such as Illumina DNA methylation data, genes are often represented by variable numbers of correlated probes, and a single probe may map to multiple genes. This complex data structure poses significant challenges for gene set enrichment analysis. The dmGsea package addresses these challenges by providing both threshold- and ranking-based competitive enrichment analysis methods, effectively accounting for probe correlation and probe number bias. These versatile functions can be applied to a wide range of omics datasets, including DNA methylation, proteomics and gene expression data.
 
