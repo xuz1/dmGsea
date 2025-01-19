@@ -1,6 +1,6 @@
 Package: dmGsea
 Type: Package
-Title: Geneset Enrichment Analysis for Complex Omics Data
+Title: Flexible Gene Set Enrichment Analysis for DNA Methylation Data
 Version: 0.99.0
 Authors@R:
   c(person("Zongli","Xu",email="xuz@niehs.nih.gov",role=c("cre","aut"),comment=c(ORCID="0000-0002-9034-8902")),
