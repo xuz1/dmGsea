@@ -21,20 +21,24 @@ output:
 
 # Introduction
 
-In many omics datasets, such as Illumina DNA methylation data, genes are often represented by variable 
-number of correlated probes, and a single probe may map to multiple genes. This complex data structure 
-poses challenges for gene set enrichment analysis. The `r Biocpkg("dmGsea")` package provides both 
-threshold- and ranking-based competitive enrichment analysis methods to address probe correlation 
-and probe number bias. These functions are versatile and can be applied to various omics datasets, 
-such as DNA methylation, proteomics and gene expression data.
+In some omics datasets, such as Illumina DNA methylation data, genes are often represented by variable 
+number of correlated probes, and a single probe can map to multiple genes. This complex data structure 
+poses significant challenges for gene set enrichment analysis. The `r Biocpkg("dmGsea")` package offers several  
+functions with novel methods specifically designed to address probe dependency and probe number bias. 
+Compared to alternative packages for DNA methylation data, these methods effectively utilize probe 
+dependancy information, provide higher statistical power, can well control type I errer rates, and 
+are computationally more efficient. The package fully supports enrichment analysis for Illumina DNA 
+methylation array data, and is easily extendable to other types of omics data when provided with 
+appropriate probe annotation information.
+
 
 # List of functions
 
 <ul>
-<li>`gsGene()`:  Gene set enrichment analysis based on gene level combined p-values</li>
-<li>`gsPG()`:  Gene set enrichment analysis based on combined probe group p-values</li>
+<li>`gsGene()`:  Gene set enrichment analysis based on gene level p-values</li>
+<li>`gsPG()`:  Gene set enrichment analysis based on probe group p-values</li>
 <li>`gsProbe()`:  Gene set enrichment analysis based on probe level p-values</li>
-<li>`gsRank()`:  Ranking-based gene set enrichment analysis based on gene level p-values</li>
+<li>`gsRank()`:  Fast enrichment analysis based on ranks of gene level statistics</li>
 </ul>
 
 
@@ -45,9 +49,8 @@ dmGsea functions.
 
 ## Example 1: Differentially methylated probes from EWAS
 
-```{r example1, eval=TRUE}
-eva=FALSE
-if(eva){
+```{r example1,eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+require(dmGsea)
 #generating example data
 annopkg="IlluminaHumanMethylation450kanno.ilmn12.hg19"
 anno <- minfi::getAnnotation(eval(annopkg))
@@ -60,6 +63,7 @@ rownames(Data4cor)=rownames(anno)
 gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopGene=1000,outGenep=TRUE,
 	 method="Threshold",gSetName="KEGG",species="Human",outfile="gs1",ncore=50)
 
+if(FALSE){
 #for significant genes at FDR threshold of 0.05
 gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",FDRthre=0.05,
          method="Threshold",gSetName="KEGG",species="Human",outfile="gs2",ncore=50)
@@ -85,9 +89,7 @@ gsProbe(probe.p=probe.p,nTopProbe=1000,arrayType="450K",gSetName="KEGG",
 
 ## Example 2: Enrichment analysis for arrays other than methylation 450K and EPIC
 
-```{r example2, eval=TRUE}
-eva=FALSE
-if(eva){
+```{r example2, eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
 kegg=getKEGG(species="Human")
 gene1=unique(as.vector(unlist(kegg[1:5])))
@@ -104,6 +106,7 @@ GeneProbeTable=data.frame(Name=Name,entrezid=geneid)
 dat=matrix(runif(length(p)*100),ncol=100)
 rownames(dat)=Name
 
+if(FALSE){
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
          method="Threshold",gSetName="KEGG",species="Human",outfile="gs5",ncore=50)
@@ -114,12 +117,11 @@ gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
 
 ## Example 3: Enrichment analysis with user provided geneset
 
-```{r example3, eval=TRUE}
-eva=FALSE
-if(eva){
+```{r example3, eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
 userGeneset=getKEGG(species="Human")
 
+if(FALSE){
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
          method="Threshold",geneSet=userGeneset,species="Human",outfile="gs7",ncore=50)
@@ -128,28 +130,9 @@ gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
 }
 ```
 
-## Example 4: Enrichment analysis with user provided geneset
+## Example 4: Enrichment analysis for gene expression type of data that do not need to combine test statistics
 
-
-```{r example4, eval=TRUE}
-eva=FALSE
-if(eva){
-#generatin example dataset
-userGeneset=getKEGG(species="Human")
-
-#enrichment analysis
-gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-         method="Threshold",geneSet=userGeneset,species="Human",outfile="gs7",ncore=50)
-gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-         method="Ranking",geneSet=userGeneset,species="Human",outfile="gs8",ncore=50)
-}
-```
-
-## Example 5: Enrichment analysis for gene expression type of data that do not need to combine test statistics
-
-```{r example5, eval=TRUE}
-eva=FALSE
-if(eva){
+```{r example4, eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
 kegg=getKEGG(species="Human")
 gene=unique(as.vector(unlist(kegg)))
@@ -157,6 +140,7 @@ p=runif(length(gene))
 names(p)=gene
 stats=-log(p)*sample(c(1,-1),length(p),replace=TRUE)
 
+if(FALSE){
 #traditional GSEA analysis, enrichment toward higher or lower end of statstics
 stats=sort(stats,decr=TRUE)
 gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e5,ncore=50)

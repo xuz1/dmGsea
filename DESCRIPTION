@@ -11,7 +11,8 @@ License: Artistic-2.0
 biocViews: GeneSetEnrichment, Pathways,DNAMethylation,Proteomics,
 	CopyNumberVariation, GeneExpression, GenomicVariation 
 Depends: utils,stats,parallel,Matrix
-Suggests: msigdbr, org.Hs.eg.db, org.Mm.eg.db, minfi, knitr, rmarkdown, GO.db
+Suggests: msigdbr, org.Hs.eg.db, org.Mm.eg.db, minfi, knitr, rmarkdown, GO.db, KEGGREST, 
+         IlluminaHumanMethylationEPICanno.ilm10b4.hg19, IlluminaHumanMethylation450kanno.ilmn12.hg19
 Imports:  dqrng,AnnotationDbi,poolr,BiasedUrn
 VignetteBuilder: knitr
 Encoding: UTF-8
