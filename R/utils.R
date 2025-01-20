@@ -45,27 +45,18 @@ getGO <- function(subset="BP",species="Human"){
 }
 
 getKEGG <- function(species="Human"){
+	if(!require("KEGGREST",quietly=TRUE))stop("KEGGREST package required")
 	if(species=="Human"){species="hsa"
 	}else if(species=="Mouse"){species="mmu"
 	}else{stop("We only have Human and Mouse data currently, please provide geneSet list")}
 
- 	URL <- paste("https://rest.kegg.jp/link/pathway", species, sep = "/")
-	GenePath <- read.table(URL, sep = "\t", quote = "\"", fill = TRUE,
-        comment.char = "", stringsAsFactors = FALSE)
-	GenePath$V1=sub(".*:", "", GenePath$V1)
-	GenePath$V2=sub(".*:", "", GenePath$V2)
-	kegg <- tapply(GenePath$V1, GenePath$V2, list)
-	URL <- paste("https://rest.kegg.jp/list/pathway",species,sep="/")
-	PathName <- read.table(URL, sep = "\t", quote = "\"",
-        	fill = TRUE, comment.char = "", stringsAsFactors = FALSE)
-	PathName$V2 = sub("-[^-]*$","",PathName$V2)
-	PathName=PathName[match(names(kegg),PathName$V1),]
-	if( sum(is.na(PathName$V1))>0){
-		idx=which(!is.na(PathName$V1))
-		PathName=PathName[idx,]
-		kegg=kegg[idx]
-	}
-	names(kegg)=paste(PathName$V1,PathName$V2,sep="|")
+	links <- keggLink("pathway", species)
+	path=data.frame(geneid=names(links),pathwayid=links)
+	path$geneid=sub(".*:","",path$geneid)
+	path$pathwayid=sub(".*:","",path$pathwayid)
+	kegg <- tapply(path$geneid, path$pathwayid,list)
+	name <- keggList("pathway", species)
+	names(kegg)=paste0(names(kegg),"|",name[names(kegg)])
 	return(kegg)
 }
 
