@@ -21,10 +21,12 @@ output:
 
 # Introduction
 
-In some omics datasets, such as Illumina DNA methylation data, genes are often represented by variable 
+In DNA methylation data, genes are often represented by variable 
 number of correlated probes, and a single probe can map to multiple genes. This complex data structure 
-poses significant challenges for gene set enrichment analysis. The `r Biocpkg("dmGsea")` package offers several  
-functions with novel methods specifically designed to address probe dependency and probe number bias. 
+poses significant challenges for gene set enrichment analysis (GSEA), and can lead to biased enrichment results.
+The `r Biocpkg("dmGsea")` package offers several  
+functions with novel methods specifically designed to perform efficient gene set enrichment analysis while 
+addressing probe dependency and probe number bias. 
 Compared to alternative packages for DNA methylation data, these methods effectively utilize probe 
 dependancy information, provide higher statistical power, can well control type I errer rates, and 
 are computationally more efficient. The package fully supports enrichment analysis for Illumina DNA 
@@ -35,10 +37,10 @@ appropriate probe annotation information.
 # List of functions
 
 <ul>
-<li>`gsGene()`:  Gene set enrichment analysis based on gene level p-values</li>
-<li>`gsPG()`:  Gene set enrichment analysis based on probe group p-values</li>
-<li>`gsProbe()`:  Gene set enrichment analysis based on probe level p-values</li>
-<li>`gsRank()`:  Fast enrichment analysis based on ranks of gene level statistics</li>
+<li>`gsGene()`:  GSEA based on aggregates association signals at gene level </li>
+<li>`gsPG()`:  GSEA using summary statistics for independent probe groups based on gene annotation</li>
+<li>`gsProbe()`:  GSEA using probe level p-values</li>
+<li>`gsRank()`:  Fast ranking based GSEA based on gene level statistics</li>
 </ul>
 
 
