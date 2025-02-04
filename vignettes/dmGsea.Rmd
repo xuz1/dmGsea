@@ -40,7 +40,7 @@ appropriate probe annotation information.
 <li>`gsGene()`:  GSEA based on aggregates association signals at gene level </li>
 <li>`gsPG()`:  GSEA using summary statistics for independent probe groups based on gene annotation</li>
 <li>`gsProbe()`:  GSEA using probe level p-values</li>
-<li>`gsRank()`:  Fast ranking based GSEA based on gene level statistics</li>
+<li>`gsRank()`:  Fast ranking-based GSEA with gene level statistics</li>
 </ul>
 
 
@@ -51,12 +51,13 @@ dmGsea functions.
 
 ## Example 1: Differentially methylated probes from EWAS
 
-```{r example1,eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+```{r example1,eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 require(dmGsea)
 #generating example data
 annopkg="IlluminaHumanMethylation450kanno.ilmn12.hg19"
 anno <- minfi::getAnnotation(eval(annopkg))
 probe.p=data.frame(Name=rownames(anno),p=runif(nrow(anno)))
+probe.p$p[1:5000]=probe.p$p[1:5000]/10000
 Data4cor=matrix(runif(nrow(probe.p)*100),ncol=100)
 rownames(Data4cor)=rownames(anno)
 
@@ -65,18 +66,17 @@ rownames(Data4cor)=rownames(anno)
 gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopGene=1000,outGenep=TRUE,
 	 method="Threshold",gSetName="KEGG",species="Human",outfile="gs1",ncore=50)
 
-if(FALSE){
 #for significant genes at FDR threshold of 0.05
-gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",FDRthre=0.05,
-         method="Threshold",gSetName="KEGG",species="Human",outfile="gs2",ncore=50)
+#gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",FDRthre=0.05,
+#         method="Threshold",gSetName="KEGG",species="Human",outfile="gs2",ncore=50)
 
 #geneset enrichment analysis with ranking based method
-gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",gseaParam=1,
-         method="Ranking",gSetName="KEGG",species="Human",outfile="gs3",ncore=50)
+#gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",gseaParam=1,
+#         method="Ranking",gSetName="KEGG",species="Human",outfile="gs3",ncore=50)
 
 #without using methylation data matrix for correlation
-gsGene(probe.p=probe.p,arrayType="450K",nTopGene=1000,
-         method="Threshold",gSetName="KEGG",species="Human",outfile="gs4",ncore=50)
+#gsGene(probe.p=probe.p,arrayType="450K",nTopGene=1000,
+#         method="Threshold",gSetName="KEGG",species="Human",outfile="gs4",ncore=50)
 
 #Enrichment analysis with probe group level P values
 gsPG(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopPG=1000,
@@ -86,12 +86,11 @@ gsPG(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopPG=1000,
 #hypergeometric test to adjust for bias due to variable number of probes per gene
 gsProbe(probe.p=probe.p,nTopProbe=1000,arrayType="450K",gSetName="KEGG",
 	  species="Human",ncore=50)
-}
 ```
 
 ## Example 2: Enrichment analysis for arrays other than methylation 450K and EPIC
 
-```{r example2, eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+```{r example2, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
 kegg=getKEGG(species="Human")
 gene1=unique(as.vector(unlist(kegg[1:5])))
@@ -108,33 +107,29 @@ GeneProbeTable=data.frame(Name=Name,entrezid=geneid)
 dat=matrix(runif(length(p)*100),ncol=100)
 rownames(dat)=Name
 
-if(FALSE){
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
          method="Threshold",gSetName="KEGG",species="Human",outfile="gs5",ncore=50)
-gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-         method="Ranking",gSetName="KEGG",species="Human",outfile="gs6",ncore=50)
-}
+#gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
+#         method="Ranking",gSetName="KEGG",species="Human",outfile="gs6",ncore=50)
 ```
 
 ## Example 3: Enrichment analysis with user provided geneset
 
-```{r example3, eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+```{r example3, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
 userGeneset=getKEGG(species="Human")
 
-if(FALSE){
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
          method="Threshold",geneSet=userGeneset,species="Human",outfile="gs7",ncore=50)
-gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-         method="Ranking",geneSet=userGeneset,species="Human",outfile="gs8",ncore=50)
-}
+#gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
+#         method="Ranking",geneSet=userGeneset,species="Human",outfile="gs8",ncore=50)
 ```
 
 ## Example 4: Enrichment analysis for gene expression type of data that do not need to combine test statistics
 
-```{r example4, eval=TRUE,echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+```{r example4, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
 kegg=getKEGG(species="Human")
 gene=unique(as.vector(unlist(kegg)))
@@ -142,13 +137,12 @@ p=runif(length(gene))
 names(p)=gene
 stats=-log(p)*sample(c(1,-1),length(p),replace=TRUE)
 
-if(FALSE){
 #traditional GSEA analysis, enrichment toward higher or lower end of statstics
 stats=sort(stats,decr=TRUE)
-gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e5,ncore=50)
+gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e4,ncore=50)
 #enrichment of genes with higher statistics
-stats=sort(abs(stats),decr=TRUE)
-gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs10",nperm=1e5,ncore=50)
+#stats=sort(abs(stats),decr=TRUE)
+#gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs10",nperm=1e4,ncore=50)
 
 #enrichment with threshold based method
 probe.p=data.frame(Name=gene,p=p)
@@ -156,7 +150,6 @@ GeneProbeTable=data.frame(Name=gene,entrezid=gene)
 #the following two functions generate equivalent results 
 gsGene(probe.p=probe.p,nTopGene=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs11",ncore=5)
 gsProbe(probe.p=probe.p,nTopProbe=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs12",ncore=5)
-}
 ```
 
 # Gene set and pathway databases
@@ -240,7 +233,7 @@ Threshold-Based GSEA or Over-Representation Analysis. It requires a threshold to
 genes (e.g., p-value, fold change) and tests whether the overlap between a predefined list of 
 differentially expressed genes (DEGs) and a gene set is statistically significant. 
 
-Ranking-Based GSEA ranks all genes in a dataset based on a continuous metric (e.g., P-value, fold change,
+Ranking-Based or functional class scoring (FCS) GSEA, ranks all genes in a dataset based on a continuous metric (e.g., P-value, fold change,
 t-statistic) and assesses whether the genes in a predefined gene set cluster at the top or bottom of 
 this ranked list. 
 

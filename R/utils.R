@@ -45,17 +45,17 @@ getGO <- function(subset="BP",species="Human"){
 }
 
 getKEGG <- function(species="Human"){
-	if(!require("KEGGREST",quietly=TRUE))stop("KEGGREST package required")
+	if(!requireNamespace("KEGGREST",quietly=TRUE))stop("KEGGREST package required")
 	if(species=="Human"){species="hsa"
 	}else if(species=="Mouse"){species="mmu"
 	}else{stop("We only have Human and Mouse data currently, please provide geneSet list")}
 
-	links <- keggLink("pathway", species)
+	links <-KEGGREST::keggLink("pathway", species)
 	path=data.frame(geneid=names(links),pathwayid=links)
 	path$geneid=sub(".*:","",path$geneid)
 	path$pathwayid=sub(".*:","",path$pathwayid)
 	kegg <- tapply(path$geneid, path$pathwayid,list)
-	name <- keggList("pathway", species)
+	name <- KEGGREST::keggList("pathway", species)
 	names(kegg)=paste0(names(kegg),"|",name[names(kegg)])
 	return(kegg)
 }
