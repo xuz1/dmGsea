@@ -5,7 +5,7 @@ c(bibentry(bibtype = "Article",
            person("Alison A", "Motsinger-Reif"),
            person("Liang", "Niu")
                 ),
-           title = "dmGsea: Flexible Gene Set Enrichment Analysis for DNA Methylaiton Data",
+           title = "Efficient gene set analysis for DNA methylation addressing probe dependency and bias",
            journal = "In review",
            year = "2024",
            pubmed = "---",

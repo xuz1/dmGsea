@@ -40,7 +40,11 @@ gsPG<-function(probe.p,Data4Cor=NULL,FDRthre=0.05,nTopPG=NULL,MonteCarlo=FALSE,
 		 outfile="gsPG",ncore=5){
 
 #gene-probe flat table
-if(is.null(Data4Cor)){combpAdjust = "none"}
+if(is.null(Data4Cor)){combpAdjust = "none"}else{
+        if(is(Data4Cor,"SummarizedExperiment")){Data4Cor=assays(Data4Cor)$beta}
+        if(!is(Data4Cor,"matrix")){
+        stop("Error: Data4Cor should be a numeric matirx or an SummarizedExperiment object")}}
+
 if(is.null(GeneProbeTable)){
         if(!(arrayType %in% c("450K","EPIC"))){stop("Specify arrayType as 450K or EPIC, or providing GeneProbeTable")}
         GeneProbeTable<-getIlluminaAnnotation(arrayType=arrayType)

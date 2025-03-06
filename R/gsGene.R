@@ -63,7 +63,10 @@ gsGene<-function(probe.p,Data4Cor=NULL,method="Threshold",FDRthre=0.05,nTopGene=
 		   species="Human",combpMethod="fisher",combpAdjust = "nyholt",
 		   outfile="gsGene",outGenep=FALSE,gseaParam=1,nperm=1e4,ncore=5){
 
-if(is.null(Data4Cor)){combpAdjust = "none"}
+if(is.null(Data4Cor)){combpAdjust = "none"}else{
+	if(is(Data4Cor,"SummarizedExperiment")){Data4Cor=assays(Data4Cor)$beta}
+	if(!is(Data4Cor,"matrix")){
+	stop("Error: Data4Cor should be a numeric matirx or a SummarizedExperiment object")}}
 if(is.null(GeneProbeTable)){
         if(!(arrayType %in% c("450K","EPIC"))){stop("Specify arrayType as 450K or EPIC, or providing GeneProbeTable")}
         GeneProbeTable<-getIlluminaAnnotation(arrayType=arrayType)

@@ -8,12 +8,12 @@ Authors@R:
     person("Liang", "Niu", role="aut",email="niulg@ucmail.uc.edu"))
 Description: The R package <b>dmGsea</b> is specifically designed for DNA methylation data, provides functions 
     to perform efficient gene set enrichment analysis while addressing probe dependency and probe number bias. 
-    The package supports Illumina 450K, EPIC, and mouse methylation arrays and can be easily extended to other 
-    omics data with user-provided probe-to-gene mapping annotations.
+    The package supports Illumina 450K, EPIC, and mouse methylation arrays and can be easily extended to handle
+    other types of omics data with user-provided probe-to-gene mapping annotations.
 License: Artistic-2.0
 biocViews: GeneSetEnrichment, Pathways,DNAMethylation,Proteomics,
 	CopyNumberVariation, GeneExpression, GenomicVariation 
-Depends: utils,stats,parallel,Matrix
+Depends: utils,stats,parallel,Matrix,SummarizedExperiment,methods
 Suggests: msigdbr, org.Hs.eg.db, org.Mm.eg.db, minfi, knitr, rmarkdown, GO.db, KEGGREST, 
          IlluminaHumanMethylationEPICanno.ilm10b4.hg19, IlluminaHumanMethylation450kanno.ilmn12.hg19
 Imports:  dqrng,AnnotationDbi,poolr,BiasedUrn

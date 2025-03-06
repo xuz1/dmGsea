@@ -2,10 +2,12 @@ import(stats)
 import(utils)
 import(parallel)
 import(Matrix)
+import(SummarizedExperiment)
 importFrom(BiasedUrn,pFNCHypergeo)
 importFrom(poolr,fisher,invchisq,stouffer,tippett)
 importFrom(AnnotationDbi,toTable,select,mapIds)
 importFrom(dqrng, dqsample.int)
+importFrom(methods, is)
 
 export(gsGene, gsPG, gsProbe,gsRank,
        geneID2geneName,getKEGG,getGO,getMSigDB,

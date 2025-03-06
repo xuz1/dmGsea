@@ -18,8 +18,9 @@ gsPG(probe.p,Data4Cor=NULL,FDRthre=0.05,nTopPG=NULL,MonteCarlo=FALSE,
 
 \arguments{
   \item{probe.p}{A data frame that include columns for probe name "Name" and P values "p".} 
-  \item{Data4Cor}{Data matrix used to generate probe.p, row as probe and column as samples.
-       Row names should be the same with probe names in probe.p}
+  \item{Data4Cor}{Methylation Data matrix (or an SummarizedExperiment object with 
+	  assays(Data4Cor)$beta as the data matrix)used to generate probe.p, row as probe
+	  and column as samples. Row names should be the same with probe names in probe.p}
   \item{FDRthre}{False discovery rate threshold to select a list of significate genes for gene set 
   enrichment testing in threshold-based method.} 
   \item{nTopPG}{Specifies the number of top-ranked probe group based on p-value. If provided, this will 
@@ -45,7 +46,8 @@ gsPG(probe.p,Data4Cor=NULL,FDRthre=0.05,nTopPG=NULL,MonteCarlo=FALSE,
 	Results will be saved to files with name prefix specified by outfile argument.
 }
 \references{
-Zongli Xu, Alison A. Motsinger-Reif, Liang Niu, OmicGsea: Efficient Gene Set Enrichment Analysis for Complex Omics Datasets. in review 2024.
+Zongli Xu, Alison A. Motsinger-Reif, Liang Niu, Efficient gene set analysis for DNA methylation 
+addressing probe dependency and bias. in review 2024.
 }
 
 \author{Zongli Xu}

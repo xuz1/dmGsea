@@ -79,19 +79,19 @@ gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopGene=1000,outGenep
 #         method="Threshold",gSetName="KEGG",species="Human",outfile="gs4",ncore=50)
 
 #Enrichment analysis with probe group level P values
-gsPG(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopPG=1000,
-        gSetName="KEGG",species="Human",outfile="gs1_2",ncore=50)
+#gsPG(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopPG=1000,
+#        gSetName="KEGG",species="Human",outfile="gs1_2",ncore=50)
 
 #Using probe level p-value directly without combine p-values, and use noncentral 
 #hypergeometric test to adjust for bias due to variable number of probes per gene
-gsProbe(probe.p=probe.p,nTopProbe=1000,arrayType="450K",gSetName="KEGG",
-	  species="Human",ncore=50)
+#gsProbe(probe.p=probe.p,nTopProbe=1000,arrayType="450K",gSetName="KEGG",
+#	  species="Human",ncore=50)
 ```
 
 ## Example 2: Enrichment analysis for arrays other than methylation 450K and EPIC
 
 ```{r example2, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
-#generatin example dataset
+#generate example dataset
 kegg=getKEGG(species="Human")
 gene1=unique(as.vector(unlist(kegg[1:5])))
 gene2=unique(as.vector(unlist(kegg[6:length(kegg)])))
@@ -145,11 +145,11 @@ gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e4,ncore
 #gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs10",nperm=1e4,ncore=50)
 
 #enrichment with threshold based method
-probe.p=data.frame(Name=gene,p=p)
-GeneProbeTable=data.frame(Name=gene,entrezid=gene)
+#probe.p=data.frame(Name=gene,p=p)
+#GeneProbeTable=data.frame(Name=gene,entrezid=gene)
 #the following two functions generate equivalent results 
-gsGene(probe.p=probe.p,nTopGene=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs11",ncore=5)
-gsProbe(probe.p=probe.p,nTopProbe=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs12",ncore=5)
+#gsGene(probe.p=probe.p,nTopGene=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs11",ncore=5)
+#gsProbe(probe.p=probe.p,nTopProbe=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs12",ncore=5)
 ```
 
 # Gene set and pathway databases
