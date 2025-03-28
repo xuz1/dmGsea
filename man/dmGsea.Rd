@@ -16,8 +16,9 @@ for independent probe groups based on gene annotation; gsProbe: GSEA using
 probe level p-values; gsRank: Fast ranking based GSEA based on gene level 
 statistics
 }
-
-
+\value(
+Functions: gsGene, gsPG, gsProbe and gsRank.
+}
 \author{
 Zongli Xu
 }
