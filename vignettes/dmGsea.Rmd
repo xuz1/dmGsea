@@ -2,11 +2,11 @@
 title: "dmGsea User's Guide"
 author: 
   - name: Zongli Xu
-    affiliation: Biostatistics & Computational Biology Branch, National Institute of Environmental Health Sciences
+    affiliation: Biostatistics & Computational Biology Branch, NIEHS
   - name: Alison A. Motsinger-Reif
-    affiliation: Biostatistics & Computational Biology Branch, National Institute of Environmental Health Sciences
+    affiliation: Biostatistics & Computational Biology Branch, NIEHS
   - name: Liang Niu
-    affiliation: Division of Biostatistics and Bioinformatics, University of Cincinnati
+    affiliation: Division of Biostatistics Bioinformatics, Univ. of Cincinnati
 package: dmGsea
 abstract: >
   A brief introduction of dmGsea R package for gene set enrichment analysis.
@@ -16,29 +16,32 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 output:
   BiocStyle::html_document:
-    toc_float: true
+  toc_float: true
 ---
 
 # Introduction
 
 In DNA methylation data, genes are often represented by variable 
-number of correlated probes, and a single probe can map to multiple genes. This complex data structure 
-poses significant challenges for gene set enrichment analysis (GSEA), and can lead to biased enrichment results.
-The `r Biocpkg("dmGsea")` package offers several  
-functions with novel methods specifically designed to perform efficient gene set enrichment analysis while 
-addressing probe dependency and probe number bias. 
-Compared to alternative packages for DNA methylation data, these methods effectively utilize probe 
-dependancy information, provide higher statistical power, can well control type I errer rates, and 
-are computationally more efficient. The package fully supports enrichment analysis for Illumina DNA 
-methylation array data, and is easily extendable to other types of omics data when provided with 
-appropriate probe annotation information.
+number of correlated probes, and a single probe can map to multiple genes.
+This complex data structure poses significant challenges for gene set
+enrichment analysis (GSEA), and can lead to biased enrichment results.
+The `r Biocpkg("dmGsea")` package offers several functions with novel
+methods specifically designed to perform efficient gene set enrichment 
+analysis while addressing probe dependency and probe number bias. 
+Compared to alternative packages for DNA methylation data, these methods
+effectively utilize probe dependency information, provide higher statistical
+power, can well control type I errer rates, and are computationally more
+efficient. The package fully supports enrichment analysis for Illumina DNA 
+methylation array data, and is easily extendable to other types of omics 
+data when provided with appropriate probe annotation information.
 
 
 # List of functions
 
 <ul>
-<li>`gsGene()`:  GSEA based on aggregates association signals at gene level </li>
-<li>`gsPG()`:  GSEA using summary statistics for independent probe groups based on gene annotation</li>
+<li>`gsGene()`: GSEA based on aggregates association signals at gene level</li>
+<li>`gsPG()`:  GSEA using summary statistics for independent probe groups based
+on gene annotation</li>
 <li>`gsProbe()`:  GSEA using probe level p-values</li>
 <li>`gsRank()`:  Fast ranking-based GSEA with gene level statistics</li>
 </ul>
@@ -46,7 +49,8 @@ appropriate probe annotation information.
 
 # Example Analysis
 
-The following examples are brief demonstrations on how to perform gene set enrichment analysis using 
+The following examples are brief demonstrations on how to perform gene set
+enrichment analysis using 
 dmGsea functions.
 
 ## Example 1: Differentially methylated probes from EWAS
@@ -54,205 +58,231 @@ dmGsea functions.
 ```{r example1,eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 require(dmGsea)
 #generating example data
-annopkg="IlluminaHumanMethylation450kanno.ilmn12.hg19"
+annopkg <- "IlluminaHumanMethylation450kanno.ilmn12.hg19"
 anno <- minfi::getAnnotation(eval(annopkg))
-probe.p=data.frame(Name=rownames(anno),p=runif(nrow(anno)))
-probe.p$p[1:5000]=probe.p$p[1:5000]/10000
-Data4cor=matrix(runif(nrow(probe.p)*100),ncol=100)
-rownames(Data4cor)=rownames(anno)
+#Use a subset of the data in the example to speed up execution
+anno <- anno[1:10000,]
+probe.p <- data.frame(Name=rownames(anno),p=runif(nrow(anno)))
+probe.p$p[1:500] <- probe.p$p[1:500]/100000
+Data4cor <- matrix(runif(nrow(probe.p)*100),ncol=100)
+rownames(Data4cor) <- rownames(anno)
 
 #geneset enrichment analysis with threshold based method
 #for top ranked 1000 genes
-gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopGene=1000,outGenep=TRUE,
-	 method="Threshold",gSetName="KEGG",species="Human",outfile="gs1",ncore=50)
-
-#for significant genes at FDR threshold of 0.05
-#gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",FDRthre=0.05,
-#         method="Threshold",gSetName="KEGG",species="Human",outfile="gs2",ncore=50)
-
-#geneset enrichment analysis with ranking based method
-#gsGene(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",gseaParam=1,
-#         method="Ranking",gSetName="KEGG",species="Human",outfile="gs3",ncore=50)
-
-#without using methylation data matrix for correlation
-#gsGene(probe.p=probe.p,arrayType="450K",nTopGene=1000,
-#         method="Threshold",gSetName="KEGG",species="Human",outfile="gs4",ncore=50)
-
-#Enrichment analysis with probe group level P values
-#gsPG(probe.p=probe.p,Data4Cor=Data4cor,arrayType="450K",nTopPG=1000,
-#        gSetName="KEGG",species="Human",outfile="gs1_2",ncore=50)
-
-#Using probe level p-value directly without combine p-values, and use noncentral 
-#hypergeometric test to adjust for bias due to variable number of probes per gene
-#gsProbe(probe.p=probe.p,nTopProbe=1000,arrayType="450K",gSetName="KEGG",
-#	  species="Human",ncore=50)
+gsGene(probe.p <- probe.p,Data4Cor=Data4cor,arrayType="450K",nTopGene=1000,
+    outGenep=TRUE, method="Threshold",gSetName="KEGG",species="Human",
+    outfile="gs1",ncore=5)
+file.remove("gs1_KEGG_KEGG.csv")
 ```
 
-## Example 2: Enrichment analysis for arrays other than methylation 450K and EPIC
+- To perform GSEA using significant genes, set `FDRthre = 0.05` to apply
+  an FDR threshold of 0.05.
+
+- To perform GSEA using a ranking-based method, specify `method = "Ranking"`.
+
+- If the argument `Data4Cor` is not provided, GSEA will be performed without
+  using the methylation data matrix to account for between-CpG correlation.
+
+- Use `gsPG()` to perform enrichment analysis based on probe group-level 
+  p-values.
+
+- To perform GSEA directly with probe-level p-values without combining them
+  into gene-level statistics, use the `gsProbe()` function. It applies a
+  noncentral hypergeometric test to adjust for bias introduced 
+  by variable numbers of probes per gene.
+
+
+## Example 2: Enrichment analysis for arrays other than 450K and EPIC
 
 ```{r example2, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 #generate example dataset
-kegg=getKEGG(species="Human")
-gene1=unique(as.vector(unlist(kegg[1:5])))
-gene2=unique(as.vector(unlist(kegg[6:length(kegg)])))
-gene1=rep(gene1,sample(1:10,length(gene1),replace=TRUE))
-gene2=rep(gene2,sample(1:10,length(gene2),replace=TRUE))
-p11=runif(length(gene1))*(1e-3)
-p2=runif(length(gene2))
-geneid=c(gene1,gene2)
-p=c(p11,p2)
-Name=paste0("cg",1:length(p))
-probe.p=data.frame(Name=Name,p=p)
-GeneProbeTable=data.frame(Name=Name,entrezid=geneid)
-dat=matrix(runif(length(p)*100),ncol=100)
-rownames(dat)=Name
+kegg <- getKEGG(species="Human")
+gene1 <- unique(as.vector(unlist(kegg[1:5])))
+gene2 <- unique(as.vector(unlist(kegg[6:length(kegg)])))
+gene1 <- rep(gene1,sample(1:10,length(gene1),replace=TRUE))
+gene2 <- rep(gene2,sample(1:10,length(gene2),replace=TRUE))
+p11 <- runif(length(gene1))*(1e-3)
+p2 <- runif(length(gene2))
+geneid <- c(gene1,gene2)
+p <- c(p11,p2)
+Name <- paste0("cg",1:length(p))
+probe.p <- data.frame(Name=Name,p=p)
+GeneProbeTable <- data.frame(Name=Name,entrezid=geneid)
+dat <- matrix(runif(length(p)*100),ncol=100)
+rownames(dat) <- Name
 
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-         method="Threshold",gSetName="KEGG",species="Human",outfile="gs5",ncore=50)
-#gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-#         method="Ranking",gSetName="KEGG",species="Human",outfile="gs6",ncore=50)
+        method="Threshold",gSetName="KEGG",species="Human",outfile="gs5",
+        ncore=5)
+file.remove("gs5_KEGG_KEGG.csv")
 ```
+
+- To perform GSEA using a ranking-based method, specify `method = "Ranking"`.
 
 ## Example 3: Enrichment analysis with user provided geneset
 
 ```{r example3, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
-userGeneset=getKEGG(species="Human")
+userGeneset <- getKEGG(species="Human")
 
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-         method="Threshold",geneSet=userGeneset,species="Human",outfile="gs7",ncore=50)
-#gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-#         method="Ranking",geneSet=userGeneset,species="Human",outfile="gs8",ncore=50)
+        method="Threshold",geneSet=userGeneset,species="Human",outfile="gs7",
+        ncore=5)
+file.remove("gs7_userSet_userSet.csv")
 ```
+- To perform GSEA using a ranking-based method, specify `method = "Ranking"`.
 
-## Example 4: Enrichment analysis for gene expression type of data that do not need to combine test statistics
+## Example 4: Enrichment analysis for gene expression type of data that do not
+## need to combine test statistics
 
 ```{r example4, eval=TRUE, results="hide", message=FALSE, warning=FALSE}
 #generatin example dataset
-kegg=getKEGG(species="Human")
-gene=unique(as.vector(unlist(kegg)))
-p=runif(length(gene))
-names(p)=gene
-stats=-log(p)*sample(c(1,-1),length(p),replace=TRUE)
+kegg <- getKEGG(species="Human")
+gene <- unique(as.vector(unlist(kegg)))
+p <- runif(length(gene))
+names(p) <- gene
+stats <- -log(p)*sample(c(1,-1),length(p),replace=TRUE)
 
 #traditional GSEA analysis, enrichment toward higher or lower end of statstics
-stats=sort(stats,decr=TRUE)
-gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e4,ncore=50)
-#enrichment of genes with higher statistics
-#stats=sort(abs(stats),decr=TRUE)
-#gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs10",nperm=1e4,ncore=50)
+stats <- sort(stats,decr=TRUE)
+gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e4,
+    ncore=5)
+file.remove("gs9_KEGG_KEGG.csv")
+file.remove("gsGene_genep.csv")
 
-#enrichment with threshold based method
-#probe.p=data.frame(Name=gene,p=p)
-#GeneProbeTable=data.frame(Name=gene,entrezid=gene)
-#the following two functions generate equivalent results 
-#gsGene(probe.p=probe.p,nTopGene=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs11",ncore=5)
-#gsProbe(probe.p=probe.p,nTopProbe=500,GeneProbeTable=GeneProbeTable,gSetName="KEGG",outfile="gs12",ncore=5)
+#enrichment of genes with higher statistics
+stats <- sort(abs(stats),decr=TRUE)
 ```
 
 # Gene set and pathway databases
 
-The package includes built-in support for KEGG, GO, MSigDB, and Reactome gene sets for both human and mouse pathways. All functions also offer options to incorporate custom, user-provided gene sets.
+The package includes built-in support for KEGG, GO, MSigDB, and Reactome gene 
+sets for both human and mouse pathways. All functions also offer options to
+incorporate custom, user-provided gene sets.
 
 ## Kyoto Encyclopedia of Genes and Genomes (KEGG)
 
-The KEGG pathway database is a widely used resource that provides 
-a comprehensive collection of manually curated biological pathways. These pathways cover various biological 
-processes, including metabolism, cellular processes, genetic information processing, and human diseases. 
-KEGG pathways integrate information about molecular interactions, reactions, and relationships between genes,
-proteins, and other molecules, helping researchers understand complex biological functions at a systems level.
+The [KEGG](https://www.kegg.jp/) pathway database is a widely used resource
+that provides a comprehensive collection of manually curated biological 
+pathways. These pathways cover various biological processes, including
+metabolism, cellular processes, genetic information processing, and human 
+diseases. KEGG pathways integrate information about molecular interactions,
+reactions, and relationships between genes,proteins, and other molecules,
+helping researchers understand complex biological functions at a systems level.
 
 ## Gene Ontology (GO)
 
-GO is a widely used framework for describing the roles of genes and their products 
-(proteins, RNAs) in biological systems. Unlike pathway databases that focus on specific molecular 
-interactions, GO provides a standardized vocabulary for annotating gene functions across species in 
-three main categories:
+[GO](https://geneontology.org/) is a widely used framework for describing the
+roles of genes and their products (proteins, RNAs) in biological systems. 
+Unlike pathway databases that focus on specific molecular 
+interactions, GO provides a standardized vocabulary for annotating gene
+functions across species in three main categories:
 
 <ul>
-<li>Biological Process (BP): Describes the biological goals a gene or protein contributes to, such as cell division
-or metabolic processes.</li>
-<li>Molecular Function (MF): Refers to the specific biochemical activities of a gene product, like binding or catalysis.</li>
-<li>Cellular Component (CC): Indicates where in the cell a gene product is active, such as the nucleus, membrane,
-or cytoplasm.</li>
+<li>Biological Process (BP): Describes the biological goals a gene or protein
+contributes to, such as cell division or metabolic processes.</li>
+<li>Molecular Function (MF): Refers to the specific biochemical activities of
+a gene product, like binding or catalysis.</li>
+<li>Cellular Component (CC): Indicates where in the cell a gene product is
+active, such as the nucleus, membrane,or cytoplasm.</li>
 </ul>
 
 ## The Molecular Signatures Database (MSigDB)
 
-MSigDB is a comprehensive collection of gene sets used for interpreting
-high-throughput gene expression data in biological research. It is a key resource for gene set enrichment 
-analysis (GSEA), helping researchers identify biological pathways, processes, and mechanisms that are 
-overrepresented in a given dataset.
+[MSigDB](https://www.gsea-msigdb.org/gsea/msigdb) is a comprehensive collection
+of gene sets used for interpreting high-throughput gene expression data in
+biological research. It is a key resource for gene set enrichment analysis
+(GSEA), helping researchers identify biological pathways, processes, and
+mechanisms that are overrepresented in a given dataset.
 
-The Molecular Signatures Database (MSigDB) is divided into several major collections, each of which contains 
-different sub-categories. Here’s a list of all the main categories and their sub-categories:
+The Molecular Signatures Database (MSigDB) is divided into several major 
+collections, each of which contains different sub-categories. Here’s a
+list of all the main categories and their sub-categories:
 
 <ul>
-<li> H: Hallmark Gene Sets. These gene sets represent fundamental biological processes, combining several 
-similar gene sets into cohesive biological themes.</li>
-<li> C1: Positional Gene Sets. Gene sets based on the chromosomal location of genes.</li>
-<li> C2: Curated Gene Sets. C2.CP: Canonical Pathways: Gene sets derived from well-known pathway databases, 
-including KEGG, Reactome, BioCarta, and others. C2.CGP: Chemical and Genetic Perturbations: Gene sets 
-derived from published studies of chemical/genetic perturbations, often based on experimental data.</li>
-<li> C3: Regulatory Target Gene Sets. C3.TFT: Transcription Factor Targets: Gene sets defined by 
-transcription factor binding motifs. C3.MIR: microRNA Targets: Gene sets representing genes targeted by 
-specific microRNAs.</li>
-<li> C4: Computational Gene Sets. C4.CGN: Cancer Gene Neighborhoods: Gene sets computationally derived 
-based on the relationships between genes in cancer studies. C4.CM: Cancer Modules: Gene sets based on 
+<li> H: Hallmark Gene Sets. These gene sets represent fundamental biological
+processes, combining several similar gene sets into cohesive biological
+themes.</li>
+<li> C1: Positional Gene Sets. Gene sets based on the chromosomal location of
+genes.</li>
+<li> C2: Curated Gene Sets. C2.CP: Canonical Pathways: Gene sets derived from
+well-known pathway databases, including KEGG, Reactome, BioCarta, and others.
+C2.CGP: Chemical and Genetic Perturbations: Gene sets derived from published
+studies of chemical/genetic perturbations, often based on experimental data.
+</li>
+<li> C3: Regulatory Target Gene Sets. C3.TFT: Transcription Factor Targets:
+Gene sets defined by transcription factor binding motifs. C3.MIR: microRNA
+Targets: Gene sets representing genes targeted by specific microRNAs.</li>
+<li> C4: Computational Gene Sets. C4.CGN: Cancer Gene Neighborhoods: Gene
+sets computationally derived based on the relationships between genes in
+cancer studies. C4.CM: Cancer Modules: Gene sets based on 
 modules of genes that co-vary across different cancers.</li>
-<li> C5: GO Gene Sets. C5.BP: Biological Process: Gene sets from the biological process branch of Gene 
-Ontology (GO). C5.CC: Cellular Component: Gene sets from the cellular component branch of GO. C5.MF: Molecular 
+<li> C5: GO Gene Sets. C5.BP: Biological Process: Gene sets from the biological
+process branch of Gene Ontology (GO). C5.CC: Cellular Component: Gene sets
+from the cellular component branch of GO. C5.MF: Molecular 
 Function: Gene sets from the molecular function branch of GO.</li>
-<li> C6: Oncogenic Signatures. Gene sets representing signatures of oncogenic pathway activation, 
-often based on experimental perturbation of cancer-related genes.</li>
-<li> C7: Immunologic Signatures. Gene sets derived from immunological studies, such as immune cell 
-expression profiles, cytokine treatments, and immune responses.</li>
-<li> C8: Cell Type Signatures. Gene sets representing the expression profiles of different cell types, 
+<li> C6: Oncogenic Signatures. Gene sets representing signatures of oncogenic
+pathway activation, often based on experimental perturbation of cancer-related 
+genes.</li>
+<li> C7: Immunologic Signatures. Gene sets derived from immunological studies,
+such as immune cell expression profiles, cytokine treatments, and immune 
+responses.</li>
+<li> C8: Cell Type Signatures. Gene sets representing the expression profiles 
+of different cell types, 
 including cell states, tissue types, and developmental stages.</li>
 </ul>
 
 ## Reactome 
 
-Reactome is a freely accessible, curated database of biological pathways that provides detailed insights 
-into molecular processes across a wide range of organisms. It covers various cellular and biochemical 
-processes, such as signal transduction, metabolism, gene expression, and immune responses. Each pathway 
-in Reactome is represented as a network of molecular interactions, where entities like proteins, small 
-molecules, and complexes participate in reactions, including binding, transport, and modifications. These 
-reactions are organized hierarchically, from individual molecular events to larger biological processes.
-Reactome pathways are extensively curated by domain experts and are used in functional analysis of 
-high-throughput omics data (e.g., gene expression, proteomics). It integrates experimental data, enabling 
-researchers to explore the molecular mechanisms behind diseases, drug responses, and other biological phenomena.
-
-
+[Reactome](https://reactome.org/) is a freely accessible, curated database of 
+biological pathways that provides detailed insights into molecular processes
+across a wide range of organisms. It covers various cellular and biochemical 
+processes, such as signal transduction, metabolism, gene expression, and immune
+responses. Each pathway in Reactome is represented as a network of molecular
+interactions, where entities like proteins, small molecules, and complexes
+participate in reactions, including binding, transport, and modifications.
+These reactions are organized hierarchically, from individual molecular
+events to larger biological processes.Reactome pathways are extensively 
+curated by domain experts and are used in functional analysis of 
+high-throughput omics data (e.g., gene expression, proteomics). It integrates
+experimental data, enabling researchers to explore the molecular mechanisms
+behind diseases, drug responses, and other biological phenomena.
 
 # Types of gene set enrichment analyses
 
-Threshold-Based GSEA or Over-Representation Analysis. It requires a threshold to define "significant"
-genes (e.g., p-value, fold change) and tests whether the overlap between a predefined list of 
-differentially expressed genes (DEGs) and a gene set is statistically significant. 
+Threshold-Based GSEA or Over-Representation Analysis. It requires a threshold
+to define "significant" genes (e.g., p-value, fold change) and tests whether
+the overlap between a predefined list of differentially expressed genes (DEGs)
+and a gene set is statistically significant. 
 
-Ranking-Based or functional class scoring (FCS) GSEA, ranks all genes in a dataset based on a continuous metric (e.g., P-value, fold change,
-t-statistic) and assesses whether the genes in a predefined gene set cluster at the top or bottom of 
-this ranked list. 
+Ranking-Based or functional class scoring (FCS) GSEA, ranks all genes in a 
+dataset based on a continuous metric (e.g., P-value, fold change, t-statistic)
+and assesses whether the genes in a predefined gene set cluster at the top or 
+bottom of this ranked list. 
 
-The choice between threshold-based and ranking-based Gene Set Enrichment Analysis (GSEA) depends on the
-nature of the hypothesis being tested, the type of data, and the goals of the analysis.
-Threshold-Based GSEA: Use for well-defined, significant subsets of genes/features when you have a justifiable 
-cutoff and are interested in strong, specific signals.
-Ranking-Based GSEA: Use when you want to incorporate the full dataset, avoid arbitrary cutoffs, or have a 
-hypothesis that requires considering a continuous spectrum of feature significance.
-
-
+The choice between threshold-based and ranking-based Gene Set Enrichment
+Analysis (GSEA) depends on the nature of the hypothesis being tested, the type
+of data, and the goals of the analysis. Threshold-Based GSEA: Use for 
+well-defined, significant subsets of genes/features when you have a justifiable 
+cutoff and are interested in strong, specific signals. Ranking-Based GSEA: Use
+when you want to incorporate the full dataset, avoid arbitrary cutoffs, or
+have a hypothesis that requires considering a continuous spectrum of feature
+significance.
 
 # Method options to combine p-value:
 <ul>
-<li> Fisher’s Method is sensitive to small p-values and works well when you expect strong evidence in a few tests.</li>
-<li> Inverse Chi-square Method (invchisq) is more flexible than Fisher’s, allowing weighting and handling of dependent or independent p-values.</li>
-<li> Stouffer’s Method balances contributions from small and large p-values and works well with correlated p-values.</li>
-<li> Tippett’s Method is highly sensitive to the smallest p-value and is best when one test is expected to show a strong signal.</li>
+<li> Fisher’s Method is sensitive to small p-values and works well when you
+expect strong evidence in a few tests.</li>
+<li> Inverse Chi-square Method (invchisq) is more flexible than Fisher’s,
+allowing weighting and handling of dependent or independent p-values.</li>
+<li> Stouffer’s Method balances contributions from small and large p-values 
+and works well with correlated p-values.</li>
+<li> Tippett’s Method is highly sensitive to the smallest p-value and is best
+when one test is expected to show a strong signal.</li>
 </ul>
 
-
-
+```{r session info}
+sessionInfo() 
+```

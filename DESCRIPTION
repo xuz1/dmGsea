@@ -3,26 +3,32 @@ Type: Package
 Title: Efficient Gene Set Enrichment Analysis for DNA Methylation Data
 Version: 0.99.0
 Authors@R:
-  c(person("Zongli","Xu",email="xuz@niehs.nih.gov",role=c("cre","aut"),comment=c(ORCID="0000-0002-9034-8902")),
-   person("Alison","Motsinger-Reif",email="alison.motsinger-reif@nih.gov",role="aut"),
-    person("Liang", "Niu", role="aut",email="niulg@ucmail.uc.edu"))
-Description: The R package <b>dmGsea</b> is specifically designed for DNA methylation data, provides functions 
-    to perform efficient gene set enrichment analysis while addressing probe dependency and probe number bias. 
-    The package supports Illumina 450K, EPIC, and mouse methylation arrays and can be easily extended to handle
-    other types of omics data with user-provided probe-to-gene mapping annotations.
+    c(person("Zongli","Xu",email="xuz@niehs.nih.gov",role=c("cre","aut"),
+        comment=c(ORCID="0000-0002-9034-8902")),
+    person("Alison","Motsinger-Reif",email="alison.motsinger-reif@nih.gov"
+        ,role="aut"),
+    person("Liang", "Niu", role="aut",email="niulg@ucmail.uc.edu"),
+    person("Zongli", "Xu", role = "fnd"))
+Description: The R package dmGsea provides efficient gene set enrichment 
+    analysis specifically for DNA methylation data. It addresses key biases,
+    including probe dependency and varying probe numbers per gene. The package
+    supports Illumina 450K, EPIC, and mouse methylation arrays. Users can also
+    apply it to other omics data by supplying custom probe-to-gene mapping 
+    annotations. dmGsea is flexible, fast, and well-suited for large-scale 
+    epigenomic studies.
 License: Artistic-2.0
-biocViews: GeneSetEnrichment, Pathways,DNAMethylation,Proteomics,
-	CopyNumberVariation, GeneExpression, GenomicVariation 
+biocViews: GeneSetEnrichment, Pathways,DNAMethylation,Proteomics,Sequencing,
+    CopyNumberVariation, GeneExpression, GenomicVariation, Coverage
 Depends: utils,stats,parallel,Matrix,SummarizedExperiment,methods
-Suggests: msigdbr, org.Hs.eg.db, org.Mm.eg.db, minfi, knitr, rmarkdown, GO.db, KEGGREST, 
-         IlluminaHumanMethylationEPICanno.ilm10b4.hg19, IlluminaHumanMethylation450kanno.ilmn12.hg19
-Imports:  dqrng,AnnotationDbi,poolr,BiasedUrn
+Suggests: msigdbr, org.Hs.eg.db, org.Mm.eg.db, minfi, knitr, rmarkdown, GO.db,
+        KEGGREST, testthat, IlluminaHumanMethylationEPICanno.ilm10b4.hg19,
+        IlluminaHumanMethylation450kanno.ilmn12.hg19
+Imports:dqrng,AnnotationDbi,poolr,BiasedUrn
 VignetteBuilder: knitr
 Encoding: UTF-8
 URL: https://github.com/Bioconductor/dmGsea
 BugReports: https://github.com/Bioconductor/dmGsea/issues
 git_url: https://git.bioconductor.org/packages/dmGsea
-Maintainer: Zongli Xu <xuz@niehs.nih.gov>
 NeedsCompilation: no
 
 
