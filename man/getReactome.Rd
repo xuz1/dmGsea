@@ -4,7 +4,7 @@
 Extract Reactome pathway gene set
 }
 \description{
-	Extract Reactome pathway gene set.
+    Extract Reactome pathway gene set.
 }
 \usage{
 getReactome(species="Human")
@@ -14,16 +14,17 @@ getReactome(species="Human")
   \item{species}{Specifies species including "Human" and "Mouse"}
 }
 \value{
-	A list of pathways and entrezid id in each pathway.
+    A list of pathways and entrezid id in each pathway.
 }
 \references{
-Zongli Xu, Liang Niu, OmicGsea: Efficient gene set analysis for complex Omics data. sutmitted 2024.
+Zongli Xu, Liang Niu, OmicGsea: Efficient gene set analysis for 
+complex Omics data. sutmitted 2024.
 }
 
 \author{Zongli Xu}
 
 \examples{
-Reactome=getReactome(species="Human")
+Reactome <- getReactome(species="Human")
 }
 
 

@@ -4,7 +4,7 @@
 Extract KEGG pathway gene set
 }
 \description{
-	Extract KEGG pathway gene set.
+    Extract KEGG pathway gene set.
 }
 \usage{
 getKEGG(species="Human")
@@ -14,13 +14,13 @@ getKEGG(species="Human")
   \item{species}{Specifies species including "Human" and "Mouse"}
 }
 \value{
-	A list of pathways and entrezid id in each pathway.
+    A list of pathways and entrezid id in each pathway.
 }
 
 \author{Zongli Xu}
 
 \examples{
-kegg=getKEGG(species="Human")
+kegg <- getKEGG(species="Human")
 }
 
 

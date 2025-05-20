@@ -4,7 +4,7 @@
 Extract gene names for given entrezids
 }
 \description{
-	Extract gene name for given entrezid.
+    Extract gene name for given entrezid.
 }
 \usage{
 geneID2geneName(gid="NULL",species="Human")
@@ -15,13 +15,13 @@ geneID2geneName(gid="NULL",species="Human")
   \item{species}{Specifies species including "Human" and "Mouse"}
 }
 \value{
-	A list of gene names.
+    A list of gene names.
 }
 \author{
 Zongli Xu
 }
 \examples{
-gname=geneID2geneName(gid=c("672","675"),species="Human")
+gname <- geneID2geneName(gid=c("672","675"),species="Human")
 }
 
 
