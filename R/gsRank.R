@@ -38,7 +38,7 @@ if(1 %in% gsSize0){
     }else if(scoreType=="pos"){
         p1 <- vapply(es1,function(x)mean(null.p>=x),FUN.VALUE=numeric(1))
     }else if(scoreType=="neg"){
-         p1 <- vapply(es1,function(x)mean(null.n<=x),FUN.VALUE=numeric(1))
+        p1 <- vapply(es1,function(x)mean(null.n<=x),FUN.VALUE=numeric(1))
     }else{stop("scoreType should be std, pos or neg")}
 }
     
@@ -85,7 +85,7 @@ if(1 %in% gsSize0){
             }
         },FUN.VALUE=numeric(1))
     }else{stop("scoreType should be pos, neg or std")}
-    permuP[permuP==0]=1/(nSim*2)
+    permuP[permuP==0] <- 1/(nSim*2)
 
 #get betafit P
     if(scoreType=="std"){
@@ -122,7 +122,6 @@ if(1 %in% gsSize0){
     p[p==1] <- max(p[!p==1])
     permuP[permuP==0] <- min(permuP[!permuP==0])
     permuP[permuP==1] <- max(permuP[!permuP==1])
-         
     logP <- -log10(p)
     pfit <- data.frame(p=p,permuP=permuP,es0=es0)
     pfit <- na.omit(pfit)
@@ -164,7 +163,7 @@ if(1 %in% gsSize0){
 
 #main function
 gsRank <- function(stats,outfile="gsRank",scoreType="std",gSetName=NULL,
-            geneSet=NULL,gseaParam=1,species="Human",nperm=1e4,ncore=5){
+            geneSet=NULL,gseaParam=1,species="Human",nperm=1e4,ncore=2){
 
     genep <- stats
     genep <- genep[!is.na(genep)]
@@ -191,8 +190,8 @@ for(gset1 in gSetName1){
     # Check geneSet, remove genes that are not in test universe
     universe <- names(genep)
     if(!is.list(geneSet))stop("geneSet should be a list object")
-    geneSet <- lapply(geneSet,function(x){x=as.character(as.vector(x)) 
-                x=x[!is.na(x)];x=x[x %in% universe];unique(x)})
+    geneSet <- lapply(geneSet,function(x){x <- as.character(as.vector(x)) 
+                x <- x[!is.na(x)];x <- x[x %in% universe];unique(x)})
     inUniv <- vapply(geneSet, function(x) length(x) > 0,FUN.VALUE=logical(1))
     geneSet <- geneSet[inUniv]
 

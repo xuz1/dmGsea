@@ -14,7 +14,7 @@ test_that("gsGene", {
     dat <- matrix(runif(length(p)*100),ncol=100)
     rownames(dat) <- Name
     gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-        method="Threshold",gSetName="KEGG",species="Human",ncore=2)
+        method="Threshold",gSetName="KEGG",species="Human",ncore=1)
 
 # Check that the output file is created
     expect_true(file.exists("gsGene_KEGG_KEGG.csv"))

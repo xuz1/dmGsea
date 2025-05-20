@@ -11,7 +11,7 @@ getIlluminaAnnotation(arrayType=c("450K","EPIC"))
 }
 
 \arguments{
-  \item{arrayType}{Specifies Illuminal methylation array type, including
+    \item{arrayType}{Specifies Illuminal methylation array type, including
     "450K" and "EPIC"}
 }
 \value{

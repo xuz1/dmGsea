@@ -11,8 +11,8 @@ geneID2geneName(gid="NULL",species="Human")
 }
 
 \arguments{
-  \item{gid}{Specifies a vector of entrezids}
-  \item{species}{Specifies species including "Human" and "Mouse"}
+    \item{gid}{Specifies a vector of entrezids}
+    \item{species}{Specifies species including "Human" and "Mouse"}
 }
 \value{
     A list of gene names.

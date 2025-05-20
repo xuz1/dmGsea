@@ -71,25 +71,25 @@ rownames(Data4cor) <- rownames(anno)
 #for top ranked 1000 genes
 gsGene(probe.p <- probe.p,Data4Cor=Data4cor,arrayType="450K",nTopGene=1000,
     outGenep=TRUE, method="Threshold",gSetName="KEGG",species="Human",
-    outfile="gs1",ncore=5)
+    outfile="gs1",ncore=2)
 file.remove("gs1_KEGG_KEGG.csv")
 ```
 
 - To perform GSEA using significant genes, set `FDRthre = 0.05` to apply
-  an FDR threshold of 0.05.
+    an FDR threshold of 0.05.
 
 - To perform GSEA using a ranking-based method, specify `method = "Ranking"`.
 
 - If the argument `Data4Cor` is not provided, GSEA will be performed without
-  using the methylation data matrix to account for between-CpG correlation.
+    using the methylation data matrix to account for between-CpG correlation.
 
 - Use `gsPG()` to perform enrichment analysis based on probe group-level 
-  p-values.
+    p-values.
 
 - To perform GSEA directly with probe-level p-values without combining them
-  into gene-level statistics, use the `gsProbe()` function. It applies a
-  noncentral hypergeometric test to adjust for bias introduced 
-  by variable numbers of probes per gene.
+    into gene-level statistics, use the `gsProbe()` function. It applies a
+    noncentral hypergeometric test to adjust for bias introduced 
+    by variable numbers of probes per gene.
 
 
 ## Example 2: Enrichment analysis for arrays other than 450K and EPIC
@@ -114,7 +114,7 @@ rownames(dat) <- Name
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
         method="Threshold",gSetName="KEGG",species="Human",outfile="gs5",
-        ncore=5)
+        ncore=2)
 file.remove("gs5_KEGG_KEGG.csv")
 ```
 
@@ -129,7 +129,7 @@ userGeneset <- getKEGG(species="Human")
 #enrichment analysis
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
         method="Threshold",geneSet=userGeneset,species="Human",outfile="gs7",
-        ncore=5)
+        ncore=2)
 file.remove("gs7_userSet_userSet.csv")
 ```
 - To perform GSEA using a ranking-based method, specify `method = "Ranking"`.
@@ -148,7 +148,7 @@ stats <- -log(p)*sample(c(1,-1),length(p),replace=TRUE)
 #traditional GSEA analysis, enrichment toward higher or lower end of statstics
 stats <- sort(stats,decr=TRUE)
 gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gs9",nperm=1e4,
-    ncore=5)
+    ncore=2)
 file.remove("gs9_KEGG_KEGG.csv")
 file.remove("gsGene_genep.csv")
 

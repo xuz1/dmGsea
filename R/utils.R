@@ -119,9 +119,9 @@ getIlluminaAnnotation <- function(arrayType=c("450K","EPIC"))
             annopkg <- "IlluminaHumanMethylation450kanno.ilmn12.hg19"
         }else if(arrayType=="EPIC") {
             annopkg <- "IlluminaHumanMethylationEPICanno.ilm10b4.hg19"
-        }else {stop ("Warning: arrayType should be 450K or EPIC ")}
+        }else {stop("arrayType should be 450K or EPIC ")}
 
-     if(!requireNamespace(eval(annopkg),quietly=TRUE))stop(annopkg,
+    if(!requireNamespace(eval(annopkg),quietly=TRUE))stop(annopkg,
                             " required but not installed")
         anno <- minfi::getAnnotation(eval(annopkg))
 
