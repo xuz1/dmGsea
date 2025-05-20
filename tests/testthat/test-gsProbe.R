@@ -14,7 +14,7 @@ test_that("gsProbe runs with probe-level p-values", {
     dat <- matrix(runif(length(p)*100),ncol=100)
     rownames(dat) <- Name
     gsProbe(probe.p=probe.p,GeneProbeTable=GeneProbeTable,
-    gSetName="KEGG",species="Human",ncore=5)
+    gSetName="KEGG",species="Human",ncore=1)
  
     # Check that the output file is created
     expect_true(file.exists("gsProbe_KEGG_KEGG.csv"))

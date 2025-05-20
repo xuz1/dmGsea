@@ -14,7 +14,7 @@ test_that("gsPG runs without error and returns numeric output", {
     dat <- matrix(runif(length(p)*100),ncol=100)
     rownames(dat) <- Name
     gsPG(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-    gSetName="KEGG",species="Human",ncore=5)
+    gSetName="KEGG",species="Human",ncore=1)
 
     # Check that the output file is created
     expect_true(file.exists("gsPG_KEGG_KEGG.csv"))

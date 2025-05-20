@@ -11,7 +11,7 @@ getKEGG(species="Human")
 }
 
 \arguments{
-  \item{species}{Specifies species including "Human" and "Mouse"}
+    \item{species}{Specifies species including "Human" and "Mouse"}
 }
 \value{
     A list of pathways and entrezid id in each pathway.

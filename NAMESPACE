@@ -10,6 +10,6 @@ importFrom(dqrng, dqsample.int)
 importFrom(methods, is)
 
 export(gsGene, gsPG, gsProbe,gsRank,
-       geneID2geneName,getKEGG,getGO,getMSigDB,
-       getReactome,getIlluminaAnnotation)
+    geneID2geneName,getKEGG,getGO,getMSigDB,
+    getReactome,getIlluminaAnnotation)
 

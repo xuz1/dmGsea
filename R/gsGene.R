@@ -48,12 +48,12 @@ gsGene <- function(probe.p,Data4Cor=NULL,method="Threshold",FDRthre=0.05,
     nTopGene=NULL,GeneProbeTable=NULL,arrayType=NULL,gSetName="KEGG",
     geneSet=NULL,species="Human",combpMethod="fisher",
     combpAdjust = "nyholt",
-    outfile="gsGene",outGenep=FALSE,gseaParam=1,nperm=1e4,ncore=5){
+    outfile="gsGene",outGenep=FALSE,gseaParam=1,nperm=1e4,ncore=2){
 
 if(is.null(Data4Cor)){combpAdjust <- "none"}else{
     if(is(Data4Cor,"SummarizedExperiment")){Data4Cor <- assays(Data4Cor)$beta}
     if(!is(Data4Cor,"matrix")){
-    stop("Error: Data4Cor should be a numeric matirx or a SummarizedExperiment
+    stop("Data4Cor should be a numeric matirx or a SummarizedExperiment
         object")}}
 if(is.null(GeneProbeTable)){
     if(!(arrayType %in% c("450K","EPIC"))){stop("Specify arrayType as 450K or 
@@ -69,7 +69,7 @@ if(combpAdjust=="none"){Data4Cor <- NULL}else{
             tmp <- sum(!probe.p$Name %in% rownames(Data4Cor))
             if(tmp>0){
     probe.p <- probe.p[probe.p$Name %in% rownames(Data4Cor),]
-    message("Warning: ",tmp," probes were missing in Data4Cor, and thus were 
+    message(tmp," probes were missing in Data4Cor, and thus were 
         excluded from analysis")
             }
 }

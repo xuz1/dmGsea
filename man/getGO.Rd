@@ -11,8 +11,8 @@ getGO(subset="BP",species="Human")
 }
 
 \arguments{
-  \item{species}{Specifies species including "Human" and "Mouse"}
-  \item{subset}{Specifies subset of GO pathway including "BP","MF" and "CC"}
+    \item{species}{Specifies species including "Human" and "Mouse"}
+    \item{subset}{Specifies subset of GO pathway including "BP","MF" and "CC"}
 }
 \value{
     A list of pathways and entrezid id in each pathway.

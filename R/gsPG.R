@@ -33,6 +33,48 @@ p.mc <- function(gs,gm.mc,gm.mc.cs,sig.idx,all.gene,mc.sig){
     return(sum(stat.null>=stat)/ncol(gm.mc))
 }
 
+mcgsea <- function(sig.gp,genep,sig.gene,geneSet,ncore,sgName){
+    ss <- 1e5
+    n.sig.gp <- length(sig.gp)
+    n.gp <- length(genep)
+    gm <- strsplit(names(genep),split="_")
+    all.gene <- unique(unlist(gm,use.names=FALSE))
+    sig.idx.gp <- which(all.gene %in% sig.gene)
+    if(n.sig.gp<n.gp/2){
+        mc.sig <- TRUE
+        gm.mc <- mclapply(seq_len(ss),function(i){idx <- dqrng::dqsample.int(
+                                    n.gp,n.sig.gp)
+                which(all.gene %in% unique(unlist(gm[idx],use.names=FALSE)))},
+                mc.cores=ncore)
+    }else{
+        mc.sig <- FALSE
+        gm.mc <- mclapply(seq_len(ss),function(i){idx <- dqrng::dqsample.int(
+                                    n.gp,n.sig.gp)
+            which(!all.gene %in% unique(unlist(gm[idx],use.names=FALSE)))},
+                mc.cores=ncore)
+    }
+    gm.mc.gp <- Matrix::sparseMatrix(i=unlist(gm.mc,use.names=FALSE),
+        j=rep(seq_len(ss),times=vapply(gm.mc,length,FUN.VALUE=numeric(1))),
+                x=1,dims=c(length(all.gene),ss))
+    rm(gm.mc)
+    gm.mc.cs.gp <- colSums(gm.mc.gp)
+    p <- unlist(mclapply(geneSet,p.mc,gm.mc=gm.mc.gp,gm.mc.cs=gm.mc.cs.gp,
+        sig.idx=sig.idx.gp,all.gene=all.gene,mc.sig=mc.sig,mc.cores=ncore))
+    p[p==0] <- min(p[p>0])/2
+    nGene <- vapply(geneSet,length,FUN.VALUE=numeric(1))
+    nSigGene <- vapply(geneSet,function(x)sum(sig.gene %in% x),
+                FUN.VALUE=numeric(1))
+Sig.Gene <- vapply(geneSet,function(x)paste(sgName[sig.gene[sig.gene %in% x]],
+                                collapse=";"),FUN.VALUE=character(1))
+    resu <- data.frame(ID=names(geneSet),nGene=nGene,nSigGene=nSigGene,p=p,
+                FDR=p.adjust(p,method="fdr"),Sig.Gene=Sig.Gene)
+    return(resu)
+}
+
+
+
+
+
 
 
 #main function
@@ -40,20 +82,15 @@ gsPG <- function(probe.p,Data4Cor=NULL,FDRthre=0.05,nTopPG=NULL,
         MonteCarlo=FALSE,GeneProbeTable=NULL,arrayType=NULL,
         gSetName=NULL,geneSet=NULL,species="Human",
         combpMethod="fisher",combpAdjust = "nyholt",
-        outfile="gsPG",ncore=5){
-
-#gene-probe flat table
+        outfile="gsPG",ncore=2){
 if(is.null(Data4Cor)){combpAdjust <- "none"}else{
     if(is(Data4Cor,"SummarizedExperiment")){Data4Cor <- assays(Data4Cor)$beta}
-    if(!is(Data4Cor,"matrix")){
-    stop("Error: Data4Cor should be a numeric matirx or an SummarizedExperiment
-            object")}}
+    if(!is(Data4Cor,"matrix")){stop("Data4Cor is not a numeric matirx")}}
 
 if(is.null(GeneProbeTable)){
-    if(!(arrayType %in% c("450K","EPIC"))){stop("Specify arrayType as 450K or 
-                                EPIC, or providing GeneProbeTable")}
-    GeneProbeTable <- getIlluminaAnnotation(arrayType=arrayType)
-}
+    if(!(arrayType %in% c("450K","EPIC"))){
+    stop("provide arrayType (450K or EPIC) or GeneProbeTable")}
+    GeneProbeTable <- getIlluminaAnnotation(arrayType=arrayType)}
 
 names(probe.p)[which(names(probe.p)=="probe")] <- "Name"
 probe.p$Name <- as.character(as.vector(probe.p$Name))
@@ -62,10 +99,7 @@ if(combpAdjust=="none"){Data4Cor <- NULL}else{
             tmp <- sum(!probe.p$Name %in% rownames(Data4Cor))
             if(tmp>0){
                 probe.p <- probe.p[probe.p$Name %in% rownames(Data4Cor),]
-                message("Warning: ",tmp," probes were missing in Data4Cor,
-                and thus were excluded from analysis")
-            }
-    }
+message(tmp," probes were missing in Data4Cor and were excluded")}}
 
 GeneProbeTable$p <- probe.p$p[match(GeneProbeTable$Name, probe.p$Name)]
 GeneProbeTable <- GeneProbeTable[complete.cases(GeneProbeTable),]
@@ -117,44 +151,7 @@ geneSet <- lapply(geneSet,function(x){x <- as.character(as.vector(x));
 inUniv <- vapply(geneSet, function(x) length(x) > 0,FUN.VALUE=logical(1))
 geneSet <- geneSet[inUniv]
 
-if(MonteCarlo){
-#    if(!requireNamespace("dqrng", quietly = TRUE)){stop("R package dqrng 
-#    required, but not installed")}
-    ss <- 1e5
-    n.sig.gp <- length(sig.gp)
-    n.gp <- length(genep)
-    gm <- strsplit(names(genep),split="_")
-    all.gene <- unique(unlist(gm,use.names=FALSE))
-    sig.idx.gp <- which(all.gene %in% sig.gene)
-    if(n.sig.gp<n.gp/2){
-        mc.sig <- TRUE
-        gm.mc <- mclapply(seq_len(ss),function(i){idx <- dqrng::dqsample.int(
-                                    n.gp,n.sig.gp)
-                which(all.gene %in% unique(unlist(gm[idx],use.names=FALSE)))},
-                mc.cores=ncore)
-    }else{
-        mc.sig <- FALSE
-        gm.mc <- mclapply(seq_len(ss),function(i){idx <- dqrng::dqsample.int(
-                                    n.gp,n.sig.gp)
-            which(!all.gene %in% unique(unlist(gm[idx],use.names=FALSE)))},
-                mc.cores=ncore)
-    }
-    gm.mc.gp <- Matrix::sparseMatrix(i=unlist(gm.mc,use.names=FALSE),
-        j=rep(seq_len(ss),times=vapply(gm.mc,length,FUN.VALUE=numeric(1))),
-                x=1,dims=c(length(all.gene),ss))
-    rm(gm.mc)
-    gm.mc.cs.gp <- colSums(gm.mc.gp)
-    p <- unlist(mclapply(geneSet,p.mc,gm.mc=gm.mc.gp,gm.mc.cs=gm.mc.cs.gp,
-        sig.idx=sig.idx.gp,all.gene=all.gene,mc.sig=mc.sig,mc.cores=ncore))
-    p[p==0] <- min(p[p>0])/2
-    nGene <- vapply(geneSet,length,FUN.VALUE=numeric(1))
-    nSigGene <- vapply(geneSet,function(x)sum(sig.gene %in% x),
-                FUN.VALUE=numeric(1))
-  Sig.Gene <- vapply(geneSet,function(x)paste(sgName[sig.gene[sig.gene %in% x]],
-                                collapse=";"),FUN.VALUE=character(1))
-    resu <- data.frame(ID=names(geneSet),nGene=nGene,nSigGene=nSigGene,p=p,
-                FDR=p.adjust(p,method="fdr"),Sig.Gene=Sig.Gene)
-}else{
+if(MonteCarlo){resu <- mcgsea (sig.gp,genep,sig.gene,geneSet,ncore,sgName)}else{
 gsea.gp <- get.gsea.gp(genep,sig.gp,sig.gene)
 resu1 <- mclapply(geneSet,function(x){p.gs(x,gsea.gp)},mc.cores=ncore)
 resu <- do.call(rbind, lapply(resu1, unlist))
@@ -162,9 +159,8 @@ resu <- data.frame(ID=names(geneSet),resu)
 names(resu) <- c("ID","nGene","nSigGene","p")
 resu$Sig.Gene <- vapply(geneSet,function(x)paste(sgName[sig.gene[sig.gene %in% x
                         ]],collapse=";"),FUN.VALUE=character(1))
-resu$FDR=p.adjust(resu$p,method="fdr")
+resu$FDR <- p.adjust(resu$p,method="fdr")
 }
-#resu <- resu[resu$Sig.Gene>0,]
 outfn <- paste0(outfile,"_",gset1,"_",gset2,".csv")
 write.csv(resu,outfn,row.names=FALSE)
 }}}

@@ -21,11 +21,12 @@ get.gsea.cpg <- function(cpg.p,cpg.gene,nTopProbe=NULL,FDRthre=0.05){
                                     all.gene %in% sig.gene,1,0))
 }
 
+
 #main function
 gsProbe <- function(probe.p,FDRthre=0.05,nTopProbe=NULL,sigProbe=NULL,
                 allProbe=NULL,
     GeneProbeTable=NULL,arrayType=NULL,gSetName=NULL,geneSet=NULL,
-    species="Human",outfile="gsProbe",ncore=5){
+    species="Human",outfile="gsProbe",ncore=2){
 
 #gene-probe flat table
 if(is.null(GeneProbeTable)){
@@ -62,14 +63,14 @@ for(gset1 in gSetName1){
     }else if(gset1=="GO"){geneSet <- getGO(gset2,species)
     }else if(gset1=="MSigDB"){geneSet <- getMSigDB(gset2,species)
     }else if(gset1=="Reactome"){geneSet <- getReactome(species)
-    }else{stop("Please specify gSetName as KEGG, GO, MSigDB, or Reactome, 
+    }else{stop("Please specify gSetName as KEGG, GO, MSigDB, or Reactome,
             or provide a geneSet list")}
     }
 # Check geneSet, remove genes that are not in test universe
 universe <- unique(GeneProbeTable$entrezid)
 if(!is.list(geneSet))stop("geneSet should be a list object")
-geneSet <- lapply(geneSet,function(x){x=as.character(as.vector(x)); 
-            x=x[!is.na(x)];x=x[x %in% universe];unique(x)})
+geneSet <- lapply(geneSet,function(x){x <- as.character(as.vector(x)); 
+            x <- x[!is.na(x)];x <- x[x %in% universe];unique(x)})
 inUniv <- vapply(geneSet, function(x) length(x) > 0,FUN.VALUE=logical(1))
 geneSet <- geneSet[inUniv]
 
