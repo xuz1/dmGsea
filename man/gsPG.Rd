@@ -14,7 +14,7 @@ adjusted in probe group level P values.
 gsPG(probe.p,Data4Cor=NULL,FDRthre=0.05,nTopPG=NULL,MonteCarlo=FALSE,
     GeneProbeTable=NULL,arrayType=NULL,gSetName=NULL,geneSet=NULL,
     species="Human",combpMethod="fisher",combpAdjust = "nyholt",
-    outfile="gsPG",ncore=2)
+    outfile="gsPG",ncore=1)
 }
 
 \arguments{
@@ -77,10 +77,10 @@ GeneProbeTable <- data.frame(Name=Name,entrezid=geneid)
 dat <- matrix(runif(length(p)*100),ncol=100)
 rownames(dat) <- Name
 gsPG(probe.p <- probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-    gSetName="KEGG",species="Human",ncore=2)
+    gSetName="KEGG",species="Human",ncore=1)
 gsPG(probe.p <- probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
     MonteCarlo=TRUE,gSetName="KEGG",species="Human",outfile="genePG_MC",
-    ncore=2)
+    ncore=1)
 }}
 
 

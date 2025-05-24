@@ -10,7 +10,7 @@ array) using ranking based method.
 }
 \usage{
 gsRank(stats,outfile="gsRank",scoreType="std",gSetName=NULL,
-        geneSet=NULL,gseaParam=1,species="Human",nperm=1e4,ncore=2)
+        geneSet=NULL,gseaParam=1,species="Human",nperm=1e4,ncore=1)
 }
 
 \arguments{
@@ -50,9 +50,9 @@ stats <- -log(p)*sample(c(1,-1),length(p),replace=TRUE)
 #traditional GSEA analysis, enrichment toward higher or lower end of statstics
 stats <- sort(stats,decr=TRUE)
 gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gsea9",nperm=1e5,
-    ncore=2)
+    ncore=1)
 #enrichment of genes with higher statistics
 stats <- sort(abs(stats),decr=TRUE)
 gsRank(stats=stats,gSetName="KEGG",scoreType="std",outfile="gsea10",nperm=1e5,
-    ncore=2)
+    ncore=1)
 }}

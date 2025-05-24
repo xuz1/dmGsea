@@ -14,7 +14,7 @@ gsGene(probe.p,Data4Cor=NULL,method="Threshold",FDRthre=0.05,nTopGene=NULL,
         GeneProbeTable=NULL,arrayType=NULL,gSetName="KEGG",
         geneSet=NULL,species="Human",combpMethod="fisher",
         combpAdjust = "nyholt",outfile="gsGene",outGenep=FALSE,
-        gseaParam=1,nperm=1e4,ncore=2)
+        gseaParam=1,nperm=1e4,ncore=1)
 }
 \arguments{
     \item{probe.p}{A data frame that include columns for probe name "Name" 
@@ -79,12 +79,12 @@ GeneProbeTable <- data.frame(Name=Name,entrezid=geneid)
 dat <- matrix(runif(length(p)*100),ncol=100)
 rownames(dat) <- Name
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
-        method="Threshold",gSetName="KEGG",species="Human",ncore=2)
+        method="Threshold",gSetName="KEGG",species="Human",ncore=1)
 gsGene(probe.p=probe.p,Data4Cor=dat,GeneProbeTable=GeneProbeTable,
         method="Ranking",gSetName="KEGG",species="Human",
-        outfile="geneRank",ncore=2)
+        outfile="geneRank",ncore=1)
 gsGene(probe.p=probe.p,GeneProbeTable=GeneProbeTable,
-        method="Threshold",gSetName="KEGG",species="Human",ncore=2)
+        method="Threshold",gSetName="KEGG",species="Human",ncore=1)
 }}
 
 
