@@ -17,153 +17,170 @@ fitBeta2 <- function(i,dat){
     return(c(shape1_pos,shape2_pos,shape1_neg,shape2_neg))
 }
 
-betaFitPermu <- function(gSet,rgl,nSim=10000,es0,ncore,scoreType){
-    gsSize0 <- vapply(gSet,length,FUN.VALUE=numeric(1))
-    ng <- length(rgl)
-if(1 %in% gsSize0){
-    idx1 <- which(gsSize0==1)
-    idx2 <- which(gsSize0>1)
-    es00 <- es0
+# Handle single-gene sets
+handle_single_gene_sets <- function(gSet, gsSize0, es0, rgl, scoreType) {
+    idx1 <- which(gsSize0 == 1)
+    idx2 <- which(gsSize0 > 1)
     es1 <- es0[idx1]
     es0 <- es0[idx2]
     gsSize0 <- gsSize0[idx2]
-    null.p <- 1-(seq_along(rgl)-1)/(length(rgl)-1)
-    null.n <- (-(seq_along(rgl)-1)/(length(rgl)-1))
-    null.s <- ifelse(null.p>abs(null.n),null.p,null.n)
-    null.s.p <- matrix(null.s[null.s>0],ncol=1)
-    null.s.n <- matrix(null.s[null.s<=0],ncol=1)
-    if(scoreType=="std"){
-        p1 <- vapply(es1,function(x){
-    if(x>0){mean(null.s.p>=x)}else{mean(null.s.n<=x)}},FUN.VALUE=numeric(1))
-    }else if(scoreType=="pos"){
-        p1 <- vapply(es1,function(x)mean(null.p>=x),FUN.VALUE=numeric(1))
-    }else if(scoreType=="neg"){
-        p1 <- vapply(es1,function(x)mean(null.n<=x),FUN.VALUE=numeric(1))
-    }else{stop("scoreType should be std, pos or neg")}
+
+    null.p <- 1 - (seq_along(rgl) - 1) / (length(rgl) - 1)
+    null.n <- -(seq_along(rgl) - 1) / (length(rgl) - 1)
+    null.s <- ifelse(null.p > abs(null.n), null.p, null.n)
+    null.s.p <- matrix(null.s[null.s > 0], ncol = 1)
+    null.s.n <- matrix(null.s[null.s <= 0], ncol = 1)
+
+    if (scoreType == "std") {
+    p1 <- vapply(es1, function(x) {
+        if (x > 0) mean(null.s.p >= x) else mean(null.s.n <= x)
+    }, FUN.VALUE = numeric(1))
+    } else if (scoreType == "pos") {
+    p1 <- vapply(es1, function(x) mean(null.p >= x), FUN.VALUE = numeric(1))
+    } else if (scoreType == "neg") {
+    p1 <- vapply(es1, function(x) mean(null.n <= x), FUN.VALUE = numeric(1))
+    } else {
+    stop("scoreType should be std, pos or neg")
+    }
+list(p1 = p1, idx1 = idx1, idx2 = idx2, es0 = es0, gsSize0 = gsSize0,
+    es00 = c(es1, es0))
 }
-    
-    gsSize <- unique(gsSize0)
+
+# Generate null distribution matrix
+generate_null_distributions <- function(nSim, gsSize, rgl,ng,ncore,scoreType){
     maxGsSize <- max(gsSize)
-    resu <- mclapply(seq_len(nSim),function(k){
-        rgs <- sample.int(ng,maxGsSize)
-        vapply(gsSize,function(gsSize_i){
-        rgs.i <- sort(rgs[seq_len(gsSize_i)])
-        ngi <- ng-gsSize_i
-        x <- rgl[rgs.i]
-        sumx <- sum(x)
-        y <- rgs.i-c(seq_len(gsSize_i))
-        tmp <- cumsum(x)/sumx-y/ngi
-        es.p <- max(tmp)
-        es.n <- min(c(0,tmp-x/sum(x)))
-        es.s <- ifelse(es.p>abs(es.n),es.p,ifelse(es.p!=abs(es.n),es.n,0))
-        switch(scoreType,"std"=es.s,"pos"=es.p,"neg"=es.n)
-        },FUN.VALUE=numeric(1))
-    },mc.cores=ncore)
-    mat.null <- do.call(rbind,lapply(resu,unlist))
-    rm(resu)
+    resu <- mclapply(seq_len(nSim), function(k) {
+    rgs <- sample.int(ng, maxGsSize)
+    vapply(gsSize, function(gsSize_i) {
+    rgs.i <- sort(rgs[seq_len(gsSize_i)])
+    ngi <- ng - gsSize_i
+    x <- rgl[rgs.i]
+    sumx <- sum(x)
+    y <- rgs.i - seq_len(gsSize_i)
+    tmp <- cumsum(x) / sumx - y / ngi
+    es.p <- max(tmp)
+    es.n <- min(c(0, tmp - x / sum(x)))
+    es.s <- ifelse(es.p > abs(es.n), es.p, ifelse(es.p != abs(es.n), es.n, 0))
+    switch(scoreType, std = es.s, pos = es.p, neg = es.n)
+    }, FUN.VALUE = numeric(1))
+    }, mc.cores = ncore)
+    do.call(rbind, lapply(resu, unlist))
+}
 
-#get permutation P    
-    colnames(mat.null) <- gsSize
-    gsSize0 <- as.character(as.vector(gsSize0))
-    if(scoreType == "pos"){
-        permuP <- vapply(seq_len(length(es0)),function(i){
-        mean(mat.null[,gsSize0[i]]>= es0[i])},FUN.VALUE=numeric(1))
-    }else if(scoreType == "neg"){
-        permuP <- vapply(seq_len(length(es0)),function(i){
-        mean(mat.null[,gsSize0[i]]<= es0[i])},FUN.VALUE=numeric(1))
-    }else if(scoreType == "std"){
-        permuP <- vapply(seq_len(length(es0)),function(i){
-            null <- mat.null[,gsSize0[i]]
-            if(es0[i]>0){
-                null <- null[null>0]
-                mean(null>=es0[i])
-#                (sum(null>=es0[i])+1)/(length(null)+1)
-            }else{
-                null <- null[null<=0]
-                mean(null<=es0[i])
-#                (sum(null<=es0[i])+1)/(length(null)+1)
-            }
-        },FUN.VALUE=numeric(1))
-    }else{stop("scoreType should be pos, neg or std")}
-    permuP[permuP==0] <- 1/(nSim*2)
+# Calculate permutation p-values
+calculate_permutation_pvalues <- function(es0,gsSize0,mat.null,scoreType,nSim){
+    gsSize0 <- as.character(gsSize0)
+    if (scoreType == "pos") {
+    vapply(seq_along(es0), function(i) {
+    mean(mat.null[, gsSize0[i]] >= es0[i])
+    }, FUN.VALUE = numeric(1))
+    } else if (scoreType == "neg") {
+    vapply(seq_along(es0), function(i) {
+    mean(mat.null[, gsSize0[i]] <= es0[i])
+    }, FUN.VALUE = numeric(1))
+    } else if (scoreType == "std") {
+    vapply(seq_along(es0), function(i) {
+    null <- mat.null[, gsSize0[i]]
+    if (es0[i] > 0) {
+        mean(null[null > 0] >= es0[i])
+    } else {
+        mean(null[null <= 0] <= es0[i])
+    }
+    }, FUN.VALUE = numeric(1))
+    } else {
+    stop("scoreType should be pos, neg or std")
+    }
+}
 
-#get betafit P
-    if(scoreType=="std"){
-        b_para <- lapply(seq_len(ncol(mat.null)),fitBeta2,dat=mat.null)
-        b_para <- do.call(rbind,lapply(b_para,unlist))
-        rownames(b_para) <- gsSize
+#Fit beta distribution and adjust p-values
+fit_beta_and_adjust_pvalues <- function(es0,mat.null,gsSize0,scoreType,
+            nSim,permuP){
+    if (scoreType == "std") {
+    b_para <- do.call(rbind, lapply(seq_len(ncol(mat.null)), fitBeta2,
+        dat = mat.null))
+    rownames(b_para) <- colnames(mat.null)
+    b_para <- b_para[as.character(gsSize0), ]
+    p <- vapply(seq_along(es0), function(i) {
+    if (es0[i] > 0) {
+        exp(stats::pbeta(es0[i], b_para[i, 1], b_para[i, 2], log.p = TRUE,
+        lower.tail = FALSE))
+    } else {
+        exp(stats::pbeta(abs(es0[i]), b_para[i, 3], b_para[i, 4], log.p = TRUE,
+        lower.tail = FALSE))
+    }
+    }, FUN.VALUE = numeric(1))
+    p[p == 0] <- min(p[p != 0])
+    p[p == 1] <- max(p[p != 1])
 
-        b_para <- b_para[as.character(as.vector(gsSize0)),]
-        p <- vapply(seq_len(length(es0)),function(i){
-            if(es0[i]>0){
-        exp(stats::pbeta(es0[i], shape1 = b_para[i,1], shape2 =b_para[i,2],
-                log.p =TRUE, lower.tail = FALSE))
-            }else{
-        exp(stats::pbeta(abs(es0[i]), shape1 = b_para[i,3], shape2 =b_para[i,4],
-                log.p =TRUE, lower.tail = FALSE))
-            }
-        },FUN.VALUE=numeric(1))
-    }else if(scoreType %in% c("pos","neg")){
-        mat.null <- abs(mat.null)
-        b_para <- lapply(seq_len(ncol(mat.null)),fitBeta,dat=mat.null)
-        b_para <- do.call(rbind,lapply(b_para,unlist))
-        rownames(b_para) <- gsSize
-        b_para <- b_para[as.character(as.vector(gsSize0)),]
-        es0 <- abs(es0)
-        p <- vapply(seq_len(length(es0)),function(i){
-        exp(stats::pbeta(es0[i], shape1 = b_para[i,1], shape2 =b_para[i,2],
-                log.p =TRUE, lower.tail = FALSE))
-            },FUN.VALUE=numeric(1))
-    }else{stop("scoreType should be pos, neg or std")}
-    p[p==0] <- min(p[p!=0])
+    permuP[permuP == 0] <- min(permuP[permuP != 0])
+    permuP[permuP == 1] <- max(permuP[permuP != 1])
 
-    if(scoreType=="std"){
-    p[p==0] <- min(p[!p==0])
-    p[p==1] <- max(p[!p==1])
-    permuP[permuP==0] <- min(permuP[!permuP==0])
-    permuP[permuP==1] <- max(permuP[!permuP==1])
     logP <- -log10(p)
-    pfit <- data.frame(p=p,permuP=permuP,es0=es0)
+    pfit <- data.frame(p = p, permuP = permuP, es0 = es0)
     pfit <- na.omit(pfit)
-    pfit <- pfit[pfit$permuP>=1/nSim,]
-#    pfit <- pfit[pfit$p>=1/nSim,]
+    pfit <- pfit[pfit$permuP >= 1 / nSim, ]
     pfit$p <- -log10(pfit$p)
     pfit$permuP <- -log10(pfit$permuP)
 
-    permuPx <- pfit$permuP[pfit$es0>0]
-    px <- pfit$p[pfit$es0>0]
-    model <- lm(permuPx~px-1)
-#    wt <- 1 / lm(abs(model$residuals) ~ model$fitted.values)$fitted.values^2
-#    model <- lm(permuPx~px-1,weights=wt)
-    p[es0>0] <- predict(model,data.frame(px=logP[es0>0]))
+    model_pos <- lm(permuP ~ p - 1, data = subset(pfit, es0 > 0))
+    model_neg <- lm(permuP ~ p - 1, data = subset(pfit, es0 <= 0))
 
-    permuPx <- pfit$permuP[pfit$es0<=0]
-    px <- pfit$p[pfit$es0<=0]
-    model <- lm(permuPx~px-1)
-#    wt <- 1 / lm(abs(model$residuals) ~ model$fitted.values)$fitted.values^2
-#    model <- lm(permuPx~px-1,weights=wt)
-    p[es0<=0] <- predict(model,data.frame(px=logP[es0<=0]))
-
-    p <- 1/10^p
+    p[es0 > 0] <- predict(model_pos, newdata = data.frame(p = logP[es0 > 0]))
+    p[es0 <= 0] <- predict(model_neg, newdata = data.frame(p = logP[es0 <= 0]))
+    p <- 1 / 10^p
+    } else {
+    mat.null <- abs(mat.null)
+    b_para <- do.call(rbind, lapply(seq_len(ncol(mat.null)), fitBeta,
+        dat = mat.null))
+    rownames(b_para) <- colnames(mat.null)
+    b_para <- b_para[as.character(gsSize0), ]
+    es0 <- abs(es0)
+    p <- vapply(seq_along(es0), function(i) {
+    exp(stats::pbeta(es0[i], b_para[i, 1], b_para[i, 2], log.p = TRUE, 
+            lower.tail = FALSE))
+    }, FUN.VALUE = numeric(1))
+    p[p == 0] <- min(p[p != 0])
     }
-
-    if(exists("p1")){
-        p2 <- p
-        p <- rep(NA,length(es00))
-        p[idx1] <- p1
-        p[idx2] <- p2
-        p2 <- permuP
-        permuP <- rep(NA,length(es00))
-        permuP[idx1] <- p1
-        permuP[idx2] <- p2
-    }
-    return(data.frame(p=p,permuP=permuP))
+    p
 }
 
 
+# betaFitPermu function
+betaFitPermu <- function(gSet, rgl, nSim = 10000, es0, ncore, scoreType) {
+    gsSize0 <- vapply(gSet, length, FUN.VALUE = numeric(1))
+    ng <- length(rgl)
+
+    if (1 %in% gsSize0) {
+    result <- handle_single_gene_sets(gSet, gsSize0, es0, rgl, scoreType)
+    p1 <- result$p1
+    idx1 <- result$idx1
+    idx2 <- result$idx2
+    es0 <- result$es0
+    gsSize0 <- result$gsSize0
+    es00 <- result$es00
+}
+
+    gsSize <- unique(gsSize0)
+    mat.null <- generate_null_distributions(nSim,gsSize,rgl,ng,ncore,scoreType)
+    colnames(mat.null) <- gsSize
+
+    permuP <- calculate_permutation_pvalues(es0, gsSize0, mat.null, scoreType,
+            nSim)
+    p <- fit_beta_and_adjust_pvalues(es0, mat.null, gsSize0, scoreType,
+        nSim,permuP)
+
+    if (exists("es00")) {
+    p2 <- p; p <- rep(NA, length(es00)); p[idx1] <- p1; p[idx2] <- p2
+    p2 <- permuP; permuP <- rep(NA, length(es00)); permuP[idx1] <- p1; 
+                permuP[idx2] <- p2
+    }
+
+    data.frame(p = p, permuP = permuP)
+}
+
 #main function
 gsRank <- function(stats,outfile="gsRank",scoreType="std",gSetName=NULL,
-            geneSet=NULL,gseaParam=1,species="Human",nperm=1e4,ncore=2){
+            geneSet=NULL,gseaParam=1,species="Human",nperm=1e4,ncore=1){
 
     genep <- stats
     genep <- genep[!is.na(genep)]

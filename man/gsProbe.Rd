@@ -11,7 +11,7 @@ using a noncentral hypergeometric test in gene set enrichment analysis.
 \usage{
 gsProbe(probe.p,FDRthre=0.05,nTopProbe=NULL,sigProbe=NULL,allProbe=NULL,
         GeneProbeTable=NULL,arrayType=NULL,gSetName=NULL,geneSet=NULL,
-        species="Human",outfile="gsProbe",ncore=2)
+        species="Human",outfile="gsProbe",ncore=1)
 }
 
 \arguments{
@@ -67,7 +67,7 @@ GeneProbeTable <- data.frame(Name=Name,entrezid=geneid)
 dat <- matrix(runif(length(p)*100),ncol=100)
 rownames(dat) <- Name
 gsProbe(probe.p=probe.p,GeneProbeTable=GeneProbeTable,
-    gSetName="KEGG",species="Human",ncore=2)
+    gSetName="KEGG",species="Human",ncore=1)
 }}
 
 
