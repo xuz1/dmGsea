@@ -1,7 +1,7 @@
 Package: dmGsea
 Type: Package
 Title: Efficient Gene Set Enrichment Analysis for DNA Methylation Data
-Version: 0.99.0
+Version: 0.99.1
 Authors@R:
     c(person("Zongli","Xu",email="xuz@niehs.nih.gov",role=c("cre","aut"),
         comment=c(ORCID="0000-0002-9034-8902")),
