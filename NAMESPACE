@@ -9,6 +9,7 @@ importFrom(AnnotationDbi,toTable,select,mapIds)
 importFrom(dqrng, dqsample.int)
 importFrom(methods, is)
 importClassesFrom(GenomeInfoDb, Seqinfo)
+importFrom(GenomeInfoDb, Seqinfo)
 
 export(gsGene, gsPG, gsProbe,gsRank,
     geneID2geneName,getKEGG,getGO,getMSigDB,
