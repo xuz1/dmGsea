@@ -8,6 +8,7 @@ importFrom(poolr,fisher,invchisq,stouffer,tippett)
 importFrom(AnnotationDbi,toTable,select,mapIds)
 importFrom(dqrng, dqsample.int)
 importFrom(methods, is)
+importFrom(GenomeInfoDb, Seqinfo)
 
 export(gsGene, gsPG, gsProbe,gsRank,
     geneID2geneName,getKEGG,getGO,getMSigDB,
